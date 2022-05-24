@@ -47,47 +47,47 @@ class _PlaylistsScreenState extends State<PlaylistsScreen> {
               ),
             ],
           ),
-          body: ReorderableListView(
-            buildDefaultDragHandles: true,
-            onReorder: (int oldIndex, int newIndex) {
-              if (_player.indices == null || _player.indices!.isEmpty) return;
-              if (oldIndex < newIndex) newIndex--;
-              _player.moveQueueItem(oldIndex, newIndex);
-              setState(() {});
-            },
-            children: [
-              if (_player.sequence != null && _player.sequence!.isNotEmpty && _player.sequence!.length == _player.indices!.length)
-                for (var i in _player.indices!)
-                  Dismissible(
-                    key: ValueKey(_player.sequence![i]),
-                    background: Container(
-                      color: Colors.redAccent,
-                      alignment: Alignment.centerRight,
-                      child: const Padding(
-                        padding: EdgeInsets.only(right: 8.0),
-                        child: Icon(Icons.delete, color: Colors.white),
-                      ),
-                    ),
-                    onDismissed: (dismissDirection) {
-                      // _playlist.removeAt(i);
-                    },
-                    child: Material(
-                      // color: i == _player.currentIndex ? Colors.pink : null,
-                      child: ListTile(
-                        title: Text(_player.sequence![i].tag.title as String),
-                        onTap: () {
-                          _player.seek(Duration.zero, index: i);
-                        },
-                      ),
-                    ),
-                  ),
-            ],
-          ),
+          body: 1 == 1
+              ? const SizedBox()
+              : ReorderableListView(
+                  buildDefaultDragHandles: true,
+                  onReorder: (int oldIndex, int newIndex) {
+                    if (_player.indices == null || _player.indices!.isEmpty) return;
+                    if (oldIndex < newIndex) newIndex--;
+                    _player.moveQueueItem(oldIndex, newIndex);
+                    setState(() {});
+                  },
+                  children: [
+                    if (_player.sequence != null && _player.sequence!.isNotEmpty && _player.sequence!.length == _player.indices!.length)
+                      for (var i in _player.indices!)
+                        Dismissible(
+                          key: ValueKey(_player.sequence![i]),
+                          background: Container(
+                            color: Colors.redAccent,
+                            alignment: Alignment.centerRight,
+                            child: const Padding(
+                              padding: EdgeInsets.only(right: 8.0),
+                              child: Icon(Icons.delete, color: Colors.white),
+                            ),
+                          ),
+                          onDismissed: (dismissDirection) {
+                            // _playlist.removeAt(i);
+                          },
+                          child: Material(
+                            // color: i == _player.currentIndex ? Colors.pink : null,
+                            child: ListTile(
+                              title: Text(_player.sequence![i].tag.title as String),
+                              onTap: () {
+                                _player.seek(Duration.zero, index: i);
+                              },
+                            ),
+                          ),
+                        ),
+                  ],
+                ),
           floatingActionButton: FloatingActionButton(onPressed: () {
-            //  _player.sortPlaylist(PlaylistSorting.byDuration, sortingOrder: SortingOrder.descending);
-            // setState(() {});
-            // _player.sortAlbums(sorting: AlbumsSorting.byNumberOfSongs, sortingOrder: SortingOrder.descending);
-            _player.test();
+            print(_player.songs.length);
+            // _player.test();
           }),
         ),
       ),
