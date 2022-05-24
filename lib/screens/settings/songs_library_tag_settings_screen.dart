@@ -246,7 +246,7 @@ class _SongsLibraryAndTagSettingsScrrenState extends State<SongsLibraryAndTagSet
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            var a = getALbumsAndArtits(audioPlayerHandler.allSongs);
+            // var a = getALbumsAndArtits(audioPlayerHandler.allSongs);
             // var cachedSongs =
             //     Hive.box('playlists').get('allSongs', defaultValue: []);
             // print('Length: ${audioPlayerHandler.albums.length}');
