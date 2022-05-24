@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
@@ -29,9 +28,9 @@ class AudioPlayerHandler {
   late final _playlist = ConcatenatingAudioSource(children: []);
   final BehaviorSubject<List<Album>> _albumsSubject = BehaviorSubject.seeded(<Album>[]);
 
-  List<Album> albums = [];
-  List<Artist> artists = [];
-  List<Song> allSongs = [];
+  final List<Album> _albums = [];
+  final List<Artist> _artists = [];
+  final List<Song> _allSongs = [];
   List<Song> currentQueue = [];
 
   Stream<ProgressState> get positionDataStream => Rx.combineLatest3<Duration, Duration, Duration?, ProgressState>(
@@ -53,7 +52,7 @@ class AudioPlayerHandler {
     var cachedSongs = Hive.box('playlists').get('allSongs', defaultValue: []);
 
     for (var song in cachedSongs) {
-      allSongs.add(Song.fromJson(Map<String, dynamic>.from(song)));
+      _allSongs.add(Song.fromJson(Map<String, dynamic>.from(song)));
     }
 
     refreshAlbumsAndArtists();
@@ -84,21 +83,21 @@ class AudioPlayerHandler {
   }
 
   void refreshAlbumsAndArtists() {
-    albums.clear();
-    artists.clear();
-    final albumsAndArtists = getALbumsAndArtits(allSongs);
-    albums.addAll(albumsAndArtists[0]);
-    artists.addAll(albumsAndArtists[1]);
+    _albums.clear();
+    _artists.clear();
+    final albumsAndArtists = getALbumsAndArtits(_allSongs);
+    _albums.addAll(albumsAndArtists[0]);
+    _artists.addAll(albumsAndArtists[1]);
 
-    _albumsSubject.add(albums);
+    _albumsSubject.add(_albums);
   }
 
   void refreshSongsFromScannedFolder(List<Song> newSongs) async {
-    allSongs.clear();
-    allSongs.addAll(newSongs);
+    _allSongs.clear();
+    _allSongs.addAll(newSongs);
     refreshAlbumsAndArtists();
     if (_playlist.length == 0) {
-      updateQueue(allSongs);
+      updateQueue(_allSongs);
     }
   }
 
@@ -171,7 +170,7 @@ class AudioPlayerHandler {
 
   void sortAlbums({AlbumsSorting sorting = AlbumsSorting.byAlbumArtist, SortingOrder sortingOrder = SortingOrder.ascending}) {
     int sort = (sortingOrder == SortingOrder.ascending) ? 1 : -1;
-    albums.sort((albumA, albumB) {
+    _albums.sort((albumA, albumB) {
 
       var defaultSorting = sort * albumA.artistName!.compareTo(albumB.artistName!);
       if (sorting == AlbumsSorting.byAlbumArtist) {
@@ -189,7 +188,7 @@ class AudioPlayerHandler {
       return defaultSorting;
     });
 
-    _albumsSubject.add(albums);
+    _albumsSubject.add(_albums);
   }
 
   Future<void> skipToNext() async {
@@ -244,6 +243,10 @@ class AudioPlayerHandler {
     return null;
   }
 
+  List<Song> get songs => _allSongs;
+  List<Album> get albums => _albums;
+  List<Artist> get artists => _artists;
+
   Duration get position => _player.position;
 
   int? get currentIndex => _player.currentIndex;
@@ -263,15 +266,17 @@ class AudioPlayerHandler {
   Stream<List<Album>> get albumsStream => _albumsSubject.stream;
 
   void test() {
-    _player.sort(currentQueue, PlaylistSorting.byDuration);
+    refreshSongsFromScannedFolder(List.of(_allSongs));
+    
+     _player.sort(currentQueue, PlaylistSorting.byDuration);
 
-    print('--------------Effective Indices----------');
-    for (var i in _player.effectiveIndices!) {
-      print('$i - ${_player.sequence![i].tag.title}');
-    }
-    print('--------------Shuffle Indices----------');
-    for (var i in _player.shuffleIndices!) {
-      print('$i - ${_player.sequence![i].tag.title}');
-    }
+    // print('--------------Effective Indices----------');
+    // for (var i in _player.effectiveIndices!) {
+    //   print('$i - ${_player.sequence![i].tag.title}');
+    // }
+    // print('--------------Shuffle Indices----------');
+    // for (var i in _player.shuffleIndices!) {
+    //   print('$i - ${_player.sequence![i].tag.title}');
+    // }
   }
 }
