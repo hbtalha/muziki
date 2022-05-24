@@ -104,8 +104,6 @@ Widget allAlbumsView({required AudioPlayerHandler player, required Function(Albu
         child: StreamBuilder<List<Album>>(
           stream: player.albumsStream,
           builder: (context, snapshot) {
-            Album album = Album(albumName: "Test");
-            album.setArtistName = 'Test';
             List<Album> albums = player.albums;
             var data = snapshot.data;
             if (data != null) {
@@ -199,6 +197,7 @@ class AlbumView extends StatefulWidget {
 
 class _AlbumViewState extends State<AlbumView> {
   final ScrollController _scrollController = ScrollController();
+  AudioPlayerHandler audioPlayer = GetIt.I<AudioPlayerHandler>();
   String dropdownValue = 'Artists';
   List<bool> enabledCards = [];
   List<Song> songs = [];
@@ -218,18 +217,18 @@ class _AlbumViewState extends State<AlbumView> {
     albumArtistsNum = widget.album.artists.length;
     enabledCards.addAll(List.generate(albumArtistsNum > 1 ? albumArtistsNum + 1 : albumArtistsNum, (index) => true));
 
-    songs.addAll(widget.album.songs);
+    songs.addAll(getSongsFromIndices(audioPlayer.songs, widget.album.songs));
     albumArtists.addAll(widget.album.artists.toList());
   }
 
   void filterSongs() {
     songs.clear();
     for (var song in widget.album.songs) {
-      if (song.trackArtistNames != null) {
-        int index = albumArtists.indexOf(song.trackArtistNames!.join('/'));
+      if (audioPlayer.songs[song!].trackArtistNames != null) {
+        int index = albumArtists.indexOf(audioPlayer.songs[song].trackArtistNames!.join('/'));
         if (index != -1) {
           if (enabledCards[albumArtistsNum > 1 ? index + 1 : index]) {
-            songs.add(song);
+            songs.add(audioPlayer.songs[song]);
           }
         }
       }
@@ -433,7 +432,7 @@ class _AlbumViewState extends State<AlbumView> {
                               child: Row(
                                 children: [
                                   Text(
-                                    '${songs.length.toString()} songs',
+                                    '${songs.length} songs',
                                     style: const TextStyle(
                                       fontSize: 17,
                                       color: Colors.white70,
@@ -538,7 +537,7 @@ class _AlbumViewState extends State<AlbumView> {
                       ),
                       const Spacer(),
                       Text(
-                        formattedDuration(Duration(milliseconds: widget.album.songs[index].trackDuration!)),
+                        formattedDuration(Duration(milliseconds: audioPlayer.songs[widget.album.songs[index]!].trackDuration!)),
                         style: const TextStyle(
                           color: primaryColor,
                           fontSize: 12,
