@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
-import 'package:just_audio_background/just_audio_background.dart';
+import 'package:muziki/services/just_audio_background.dart';
 import 'package:muziki/screens/albums_screen.dart';
 import 'package:muziki/screens/artists_screen.dart';
 import 'package:muziki/screens/playing_screen.dart';
