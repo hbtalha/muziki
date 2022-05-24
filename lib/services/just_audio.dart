@@ -19,7 +19,7 @@ import 'package:uuid/uuid.dart';
 
 import '../utils/global_variables.dart';
 
-final _uuid = Uuid();
+const _uuid = Uuid();
 
 JustAudioPlatform? _pluginPlatformCache;
 
@@ -502,7 +502,7 @@ class AudioPlayer {
     if (_positionSubject == null) {
       _positionSubject = BehaviorSubject<Duration>();
       if (!_disposed) {
-        _positionSubject!.addStream(createPositionStream(steps: 800, minPeriod: Duration(milliseconds: 16), maxPeriod: Duration(milliseconds: 200)));
+        _positionSubject!.addStream(createPositionStream(steps: 800, minPeriod: const Duration(milliseconds: 16), maxPeriod: const Duration(milliseconds: 200)));
       }
     }
     return _positionSubject!.stream;
@@ -1066,7 +1066,9 @@ class AudioPlayer {
       _idlePlatform = null;
     }
     _audioSource = null;
-    _audioSources.values.forEach((s) => s._dispose());
+    for (var s in _audioSources.values) {
+      s._dispose();
+    }
     _audioSources.clear();
     _proxy.stop();
     await _durationSubject.close();
@@ -1201,7 +1203,7 @@ class AudioPlayer {
       _playerDataSubscription?.cancel();
       if (!force) {
         final oldPlatform = _platformValue!;
-        if (!(oldPlatform is _IdleAudioPlayer)) {
+        if (oldPlatform is! _IdleAudioPlayer) {
           await _disposePlatform(oldPlatform);
         }
       }
@@ -2704,7 +2706,7 @@ class LockCachingAudioSource extends StreamAudioSource {
           cacheResponse.controller.close();
         }
       }
-      (await _partialCacheFile).renameSync((await cacheFile).path);
+      (await _partialCacheFile).renameSync((cacheFile).path);
       await subscription.cancel();
       httpClient.close();
       _downloading = false;
@@ -2869,9 +2871,9 @@ _ProxyHandler _proxyHandlerForUri(Uri uri, Map<String, String>? headers) {
     request.headers.forEach((name, value) {
       originRequest.headers.set(name, value);
     });
-    headers?.entries.forEach((entry) {
+    for (var entry in headers?.entries) {
       originRequest.headers.set(entry.key, entry.value);
-    });
+    }
     if (host != null) {
       originRequest.headers.set('host', host);
     } else {
@@ -3245,7 +3247,9 @@ class AudioPipeline {
   List<AudioEffect> get _audioEffects => <AudioEffect>[...androidAudioEffects, ...darwinAudioEffects];
 
   void _setup(AudioPlayer player) {
-    _audioEffects.forEach((effect) => effect._setup(player));
+    for (var effect in _audioEffects) {
+      effect._setup(player);
+    }
   }
 }
 
