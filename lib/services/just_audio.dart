@@ -2871,9 +2871,10 @@ _ProxyHandler _proxyHandlerForUri(Uri uri, Map<String, String>? headers) {
     request.headers.forEach((name, value) {
       originRequest.headers.set(name, value);
     });
-    for (var entry in headers?.entries) {
+    if(headers != null)
+    {for (var entry in headers.entries) {
       originRequest.headers.set(entry.key, entry.value);
-    }
+    }}
     if (host != null) {
       originRequest.headers.set('host', host);
     } else {
