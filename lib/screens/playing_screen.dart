@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
 import 'package:muziki/services/just_audio.dart';
-import 'package:just_audio_background/just_audio_background.dart';
+import 'package:muziki/services/just_audio_background.dart';
 import 'package:mmoo_lyric/lyric_util.dart';
 import 'package:muziki/models/song.dart';
 import 'package:muziki/services/audio_player_handler.dart';
