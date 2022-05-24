@@ -157,9 +157,9 @@ Future<void> scanSongs(List<Object> args) async {
 }
 
 // ------ album songs as list of int ---------------------- //
-List getALbumsAndArtitsI(List<Song> songs) {
-  List<AArtist> artists = [];
-  List<AAlbum> albums = [];
+List getALbumsAndArtits(List<Song> songs) {
+  List<Artist> artists = [];
+  List<Album> albums = [];
   Set<String> artistsNames = {};
   Set<String> albumsNames = {};
 
@@ -167,7 +167,7 @@ List getALbumsAndArtitsI(List<Song> songs) {
     artistsNames.add(songs[i].albumArtistName ?? '<unknown>');
   }
 
-  artists.addAll(artistsNames.map((e) => AArtist(name: e)).toList());
+  artists.addAll(artistsNames.map((e) => Artist(name: e)).toList());
 
   for (var artist in artists) {
     var artistSongs = songs.where((element) => element.albumArtistName == artist.name);
@@ -176,11 +176,11 @@ List getALbumsAndArtitsI(List<Song> songs) {
 
   albumsNames.addAll(songs.map((e) => e.albumName ?? '<unknown>').toList());
 
-  albums.addAll(albumsNames.map((e) => AAlbum(albumName: e)).toList());
+  albums.addAll(albumsNames.map((e) => Album(albumName: e)).toList());
 
   for (var artistName in artistsNames) {
     for (var album in albums) {
-      List<Song> albumSongs = songs.where((song) => song.albumName == album.albumName && song.albumArtistName == artistName) as List<Song>;
+      List<Song> albumSongs = songs.where((song) => song.albumName == album.albumName && song.albumArtistName == artistName).toList();
 
       album.songs.addAll(albumSongs.map((e) => songs.indexOf(e)).toList());
 
@@ -204,100 +204,109 @@ List getALbumsAndArtitsI(List<Song> songs) {
   return [albums, artists];
 }
 
-List getALbumsAndArtits(List<Song> songs) {
-  List<Artist> artists = [];
-  List<Album> albums = [];
-  Set<String> artistsNames = {};
-  Set<String> albumsNames = {};
+// List getALbumsAndArtits(List<Song> songs) {
+//   List<Artist> artists = [];
+//   List<Album> albums = [];
+//   Set<String> artistsNames = {};
+//   Set<String> albumsNames = {};
 
-  for (int i = 0; i < songs.length; ++i) {
-    artistsNames.add(songs[i].albumArtistName ?? '<unknown>');
+//   for (int i = 0; i < songs.length; ++i) {
+//     artistsNames.add(songs[i].albumArtistName ?? '<unknown>');
+//   }
+
+//   artists.addAll(artistsNames.map((e) => Artist(name: e)).toList());
+
+//   for (var artist in artists) {
+//     artist.songs.addAll(songs.where((element) => element.albumArtistName == artist.name));
+//   }
+
+//   albumsNames.addAll(songs.map((e) => e.albumName ?? '<unknown>').toList());
+
+//   albums.addAll(albumsNames.map((e) => Album(albumName: e)).toList());
+
+//   for (var artistName in artistsNames) {
+//     for (var album in albums) {
+//       album.songs.addAll(songs.where((song) => song.albumName == album.albumName && song.albumArtistName == artistName));
+
+//       album.artistName ??= artistName;
+//       album.albumArt ??= album.songs.firstWhere((song) => song.albumArt != null, orElse: () => Song()).albumArt;
+//       album.year ??= album.songs.firstWhere((song) => song.year != null, orElse: () => Song()).year;
+//       album.albumlength ??= totalDuration(album.songs);
+//       album.artists.addAll(album.songs.map((song) => song.trackArtistNames?.join('/') ?? '<unknown>').toList());
+//     }
+//   }
+
+//   return [albums, artists];
+// }
+
+// List getALbumsAndArtitsObsolete(List<Song> songs) {
+//   List<Artist> artists = [];
+//   List<Album> albums = [];
+//   Set<String> artistsNames = {};
+
+//   for (int i = 0; i < songs.length; ++i) {
+//     artistsNames.add(songs[i].albumArtistName ?? '<unknown>');
+//   }
+
+//   artists.addAll(artistsNames.map((e) => Artist(name: e)).toList());
+
+//   for (int i = 0; i < artists.length; ++i) {
+//     for (int j = 0; j < songs.length; ++j) {
+//       if (artists[i].name == songs[j].albumArtistName) {
+//         artists[i].songs.add(songs[j]);
+//       }
+//     }
+//     Set<String> albumsNames = {};
+//     for (int k = 0; k < artists[i].songs.length; ++k) {
+//       albumsNames.add(artists[i].songs[k].albumName ?? '<unknown>');
+//     }
+
+//     for (var element in albumsNames) {
+//       Album album = Album();
+//       album.setArtistName = artists[i].name;
+//       album.setName = element;
+
+//       for (int y = 0; y < artists[i].songs.length; ++y) {
+//         if (element == artists[i].songs[y].albumName) {
+//           if (album.year == null) {
+//             if (artists[i].songs[y].year != null) {
+//               album.setYear = artists[i].songs[y].year;
+//             }
+//           }
+
+//           if (album.albumArt == null) {
+//             if (artists[i].songs[y].albumArt != null) {
+//               album.albumArt = artists[i].songs[y].albumArt;
+//             }
+//           }
+
+//           album.artists.add(artists[i].songs[y].trackArtistNames?.join('/') ?? "<unknown>");
+//           album.songs.add(artists[i].songs[y]);
+//         }
+//       }
+
+//       Duration albumLength = Duration.zero;
+
+//       for (var song in album.songs) {
+//         albumLength += Duration(milliseconds: song.trackDuration ?? 0);
+//       }
+
+//       album.setLength = albumLength;
+
+//       albums.add(album);
+//     }
+//   }
+
+//   return [albums, artists];
+// }
+
+List<Song> getSongsFromIndices(List<Song> songs, List<int?> indices) {
+  List<Song> extractedSongs = [];
+
+  for (var index in indices) {
+    extractedSongs.add(songs[index!]);
   }
-
-  artists.addAll(artistsNames.map((e) => Artist(name: e)).toList());
-
-  for (var artist in artists) {
-    artist.songs.addAll(songs.where((element) => element.albumArtistName == artist.name));
-  }
-
-  albumsNames.addAll(songs.map((e) => e.albumName ?? '<unknown>').toList());
-
-  albums.addAll(albumsNames.map((e) => Album(albumName: e)).toList());
-
-  for (var artistName in artistsNames) {
-    for (var album in albums) {
-      album.songs.addAll(songs.where((song) => song.albumName == album.albumName && song.albumArtistName == artistName));
-
-      album.artistName ??= artistName;
-      album.albumArt ??= album.songs.firstWhere((song) => song.albumArt != null, orElse: () => Song()).albumArt;
-      album.year ??= album.songs.firstWhere((song) => song.year != null, orElse: () => Song()).year;
-      album.albumlength ??= totalDuration(album.songs);
-      album.artists.addAll(album.songs.map((song) => song.trackArtistNames?.join('/') ?? '<unknown>').toList());
-    }
-  }
-
-  return [albums, artists];
-}
-
-List getALbumsAndArtitsObsolete(List<Song> songs) {
-  List<Artist> artists = [];
-  List<Album> albums = [];
-  Set<String> artistsNames = {};
-
-  for (int i = 0; i < songs.length; ++i) {
-    artistsNames.add(songs[i].albumArtistName ?? '<unknown>');
-  }
-
-  artists.addAll(artistsNames.map((e) => Artist(name: e)).toList());
-
-  for (int i = 0; i < artists.length; ++i) {
-    for (int j = 0; j < songs.length; ++j) {
-      if (artists[i].name == songs[j].albumArtistName) {
-        artists[i].songs.add(songs[j]);
-      }
-    }
-    Set<String> albumsNames = {};
-    for (int k = 0; k < artists[i].songs.length; ++k) {
-      albumsNames.add(artists[i].songs[k].albumName ?? '<unknown>');
-    }
-
-    for (var element in albumsNames) {
-      Album album = Album();
-      album.setArtistName = artists[i].name;
-      album.setName = element;
-
-      for (int y = 0; y < artists[i].songs.length; ++y) {
-        if (element == artists[i].songs[y].albumName) {
-          if (album.year == null) {
-            if (artists[i].songs[y].year != null) {
-              album.setYear = artists[i].songs[y].year;
-            }
-          }
-
-          if (album.albumArt == null) {
-            if (artists[i].songs[y].albumArt != null) {
-              album.albumArt = artists[i].songs[y].albumArt;
-            }
-          }
-
-          album.artists.add(artists[i].songs[y].trackArtistNames?.join('/') ?? "<unknown>");
-          album.songs.add(artists[i].songs[y]);
-        }
-      }
-
-      Duration albumLength = Duration.zero;
-
-      for (var song in album.songs) {
-        albumLength += Duration(milliseconds: song.trackDuration ?? 0);
-      }
-
-      album.setLength = albumLength;
-
-      albums.add(album);
-    }
-  }
-
-  return [albums, artists];
+  return extractedSongs;
 }
 
 List<Song> sortedSongs(List<Song> songs, PlaylistSorting playlistSorting, {SortingOrder sortingOrder = SortingOrder.ascending}) {
@@ -333,6 +342,18 @@ List<Song> sortedSongs(List<Song> songs, PlaylistSorting playlistSorting, {Sorti
   });
 
   return sortedSongs;
+}
+
+List<int> sortedSongsByIndices(List<Song> songs, List<int> indices, PlaylistSorting playlistSorting,
+    {SortingOrder sortingOrder = SortingOrder.ascending}) {
+  List<Song> songsSorted = sortedSongs(getSongsFromIndices(songs, indices), playlistSorting, sortingOrder: sortingOrder);
+
+  List<int> sortedIndices = [];
+  for(var song in songsSorted){
+    sortedIndices.add(songs.indexOf(song));
+  }
+
+  return sortedIndices;
 }
 
 showToast(String msg) {
