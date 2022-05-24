@@ -195,28 +195,38 @@ class _FirstViewState extends State<FirstView> {
             ],
           ),
         ),
-        body: ListView.builder(
-            controller: scrollController,
-            itemCount: audioPlayer.artists.length,
-            itemBuilder: (BuildContext context, int index) {
-              return ListTile(
-                onTap: () => widget.callback(audioPlayer.artists[index], scrollController.offset),
-                visualDensity: const VisualDensity(vertical: -3),
-                dense: true,
-                title: Text(audioPlayer.artists[index].name,
-                    style: const TextStyle(
-                      color: primaryColor,
-                      fontSize: 14,
-                    )),
-                subtitle: Text(
-                  '${audioPlayer.artists[index].songs.length} songs',
-                  style: const TextStyle(
-                    color: secondaryColor,
-                    fontSize: 12,
-                  ),
-                ),
-              );
-            }),
+        body: StreamBuilder<List<Artist>>(
+          stream: audioPlayer.artistsStream,
+          builder: (context, snapshot) {
+            List<Artist> artists = audioPlayer.artists;
+            var data = snapshot.data;
+            if (data != null) {
+              artists = data;
+            }
+            return ListView.builder(
+                controller: scrollController,
+                itemCount: artists.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return ListTile(
+                    onTap: () => widget.callback(artists[index], scrollController.offset),
+                    visualDensity: const VisualDensity(vertical: -3),
+                    dense: true,
+                    title: Text(artists[index].name,
+                        style: const TextStyle(
+                          color: primaryColor,
+                          fontSize: 14,
+                        )),
+                    subtitle: Text(
+                      '${artists[index].songs.length} songs',
+                      style: const TextStyle(
+                        color: secondaryColor,
+                        fontSize: 12,
+                      ),
+                    ),
+                  );
+                });
+          },
+        ),
       ),
     );
   }
@@ -261,7 +271,7 @@ class _ArtistViewState extends State<ArtistView> {
 
   void filterSongs() {
     songs.clear();
-    
+
     for (var song in widget.artist.songs) {
       if (audioPlayer.songs[song].trackArtistNames != null) {
         int index = albums.indexOf(audioPlayer.songs[song].trackArtistNames!.join('/'));
