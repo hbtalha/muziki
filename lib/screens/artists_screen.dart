@@ -114,7 +114,12 @@ class _FirstViewState extends State<FirstView> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
+    return WillPopScope(
+      onWillPop: () async {
+          print('show me something');
+         
+          return false;
+        },
       child: Scaffold(
         appBar: AppBar(
           toolbarHeight: 130,
@@ -261,20 +266,20 @@ class _ArtistViewState extends State<ArtistView> {
   void initState() {
     super.initState();
 
-    albumsNum = audioPlayer.artists.length;
-    enabledCards.addAll(List.generate(albumsNum > 1 ? albumsNum + 1 : albumsNum, (index) => true));
-
     songs.addAll(getSongsFromIndices(audioPlayer.songs, widget.artist.songs));
     albumsSet.addAll(songs.map((e) => e.albumName).toList());
     albums.addAll(albumsSet.toList());
+    albumsNum = albums.length;
+
+    enabledCards.addAll(List.generate(albumsNum > 1 ? albumsNum + 1 : albumsNum, (index) => true));
   }
 
   void filterSongs() {
     songs.clear();
 
     for (var song in widget.artist.songs) {
-      if (audioPlayer.songs[song].trackArtistNames != null) {
-        int index = albums.indexOf(audioPlayer.songs[song].trackArtistNames!.join('/'));
+      if (audioPlayer.songs[song].albumName != null) {
+        int index = albums.indexOf(audioPlayer.songs[song].albumName);
         if (index != -1) {
           if (enabledCards[albumsNum > 1 ? index + 1 : index]) {
             songs.add(audioPlayer.songs[song]);
@@ -350,7 +355,15 @@ class _ArtistViewState extends State<ArtistView> {
                                     itemCount: albumsNum > 1 ? albumsNum + 1 : albumsNum,
                                     scrollDirection: Axis.horizontal,
                                     itemBuilder: (context, index) {
-                                      // String artists = '';
+                                      String? album = albums.elementAt(albumsNum > 1
+                                              ? index == 0
+                                                  ? index
+                                                  : index - 1
+                                              : index) ??
+                                          "unknown";
+                                      if (album.length > 25) {
+                                        album = album.substring(0, 25);
+                                      }
 
                                       return Card(
                                         clipBehavior: Clip.antiAlias,
@@ -400,9 +413,9 @@ class _ArtistViewState extends State<ArtistView> {
                                                   child: Text(
                                                     albumsNum > 1
                                                         ? index == 0
-                                                            ? 'All Artists'
-                                                            : widget.artist.name
-                                                        : albums[index] ?? "un",
+                                                            ? 'All Albums'
+                                                            : album
+                                                        : album,
                                                     style: TextStyle(fontSize: 13, color: enabledCards[index] ? Colors.blue : Colors.grey),
                                                     textAlign: TextAlign.center,
                                                   ),
