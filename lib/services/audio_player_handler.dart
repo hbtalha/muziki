@@ -1,4 +1,3 @@
-
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:hive/hive.dart';
@@ -27,6 +26,7 @@ class AudioPlayerHandler {
   final AudioPlayer _player = AudioPlayer();
   late final _playlist = ConcatenatingAudioSource(children: []);
   final BehaviorSubject<List<Album>> _albumsSubject = BehaviorSubject.seeded(<Album>[]);
+  final BehaviorSubject<List<Artist>> _artistsSubject = BehaviorSubject.seeded(<Artist>[]);
 
   final List<Album> _albums = [];
   final List<Artist> _artists = [];
@@ -90,6 +90,7 @@ class AudioPlayerHandler {
     _artists.addAll(albumsAndArtists[1]);
 
     _albumsSubject.add(_albums);
+    _artistsSubject.add(_artists);
   }
 
   void refreshSongsFromScannedFolder(List<Song> newSongs) async {
@@ -144,7 +145,7 @@ class AudioPlayerHandler {
   }
 
   Future<void> insertQueueItem(int index, Song song) async {
-     await _playlist.insert(index, _createSource(song));
+    await _playlist.insert(index, _createSource(song));
   }
 
   Future<void> updateMediaItem(MediaItem mediaItem) async {
@@ -171,7 +172,6 @@ class AudioPlayerHandler {
   void sortAlbums({AlbumsSorting sorting = AlbumsSorting.byAlbumArtist, SortingOrder sortingOrder = SortingOrder.ascending}) {
     int sort = (sortingOrder == SortingOrder.ascending) ? 1 : -1;
     _albums.sort((albumA, albumB) {
-
       var defaultSorting = sort * albumA.artistName!.compareTo(albumB.artistName!);
       if (sorting == AlbumsSorting.byAlbumArtist) {
         return defaultSorting;
@@ -265,10 +265,12 @@ class AudioPlayerHandler {
 
   Stream<List<Album>> get albumsStream => _albumsSubject.stream;
 
+  Stream<List<Artist>> get artistsStream => _artistsSubject.stream;
+
   void test() {
     refreshSongsFromScannedFolder(List.of(_allSongs));
-    
-     _player.sort(currentQueue, PlaylistSorting.byDuration);
+
+    _player.sort(currentQueue, PlaylistSorting.byDuration);
 
     // print('--------------Effective Indices----------');
     // for (var i in _player.effectiveIndices!) {
