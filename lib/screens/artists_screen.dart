@@ -313,7 +313,7 @@ class _ArtistSongsViewState extends State<ArtistSongsView> {
                 expandedHeight: 0,
                 backgroundColor: Colors.transparent,
                 elevation: 0,
-                toolbarHeight: 240,
+                toolbarHeight: 190,
                 automaticallyImplyLeading: false,
                 flexibleSpace: LayoutBuilder(
                   builder: (
@@ -485,7 +485,14 @@ class _ArtistSongsViewState extends State<ArtistSongsView> {
                 title: AnimatedBuilder(
                   animation: _scrollController,
                   builder: (context, child) {
-                    return SizedBox.shrink();
+                    return PlaylistHead(
+                      onMoreButtonPressed: () {},
+                      onShuffleButtonPressed: () {},
+                      onSortButtonPressed: () {},
+                      onBackButtonPressed: () => widget.backToFirstView(),
+                      textNextToBackButton: widget.artist.name,
+                      showBackButton: (!_scrollController.hasClients || _scrollController.offset > 224) ? true : false,
+                    );
                   },
                 ),
               ),
