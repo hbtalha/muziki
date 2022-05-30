@@ -39,7 +39,7 @@ class _ArtistsScreenState extends State<ArtistsScreen> {
 
   void goToAlbum(Artist artist, double offst) {
     offset = offst;
-    pages[1] = ArtistView(
+    pages[1] = ArtistSongsView(
       artist: artist,
       backToFirstView: backToAlbumsView,
       playSong: playSong,
@@ -237,17 +237,17 @@ class _FirstViewState extends State<FirstView> {
   }
 }
 
-class ArtistView extends StatefulWidget {
+class ArtistSongsView extends StatefulWidget {
   final Artist artist;
   final void Function() backToFirstView;
   final void Function(int, List<Song>) playSong;
-  const ArtistView({Key? key, required this.artist, required this.backToFirstView, required this.playSong}) : super(key: key);
+  const ArtistSongsView({Key? key, required this.artist, required this.backToFirstView, required this.playSong}) : super(key: key);
 
   @override
-  State<ArtistView> createState() => _ArtistViewState();
+  State<ArtistSongsView> createState() => _ArtistSongsViewState();
 }
 
-class _ArtistViewState extends State<ArtistView> {
+class _ArtistSongsViewState extends State<ArtistSongsView> {
   final ScrollController _scrollController = ScrollController();
   AudioPlayerHandler audioPlayer = GetIt.I<AudioPlayerHandler>();
   List<bool> enabledCards = [];
@@ -485,13 +485,7 @@ class _ArtistViewState extends State<ArtistView> {
                 title: AnimatedBuilder(
                   animation: _scrollController,
                   builder: (context, child) {
-                    return PlaylistHead(
-                        onMoreButtonPressed: () {},
-                        onShuffleButtonPressed: () {},
-                        onSortButtonPressed: () {},
-                        onBackButtonPressed: () => widget.backToFirstView(),
-                        textNextToBackButton: widget.artist.name,
-                        showBackButton: (!_scrollController.hasClients || _scrollController.offset > 224) ? true : false);
+                    return SizedBox.shrink();
                   },
                 ),
               ),
