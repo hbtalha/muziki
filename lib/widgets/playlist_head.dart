@@ -18,6 +18,7 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:muziki/utils/colors.dart';
 
 class PlaylistHead extends StatelessWidget {
   bool showBackButton = false;
@@ -58,8 +59,9 @@ class PlaylistHead extends StatelessWidget {
             ),
           if (showBackButton)
             Padding(
-                padding: const EdgeInsets.only(top: 5),
-                child: Text(textNextToBackButton)),
+              padding: const EdgeInsets.only(top: 5),
+              child: Text(textNextToBackButton),
+            ),
           const Spacer(),
           IconButton(
             onPressed: () {},
@@ -71,9 +73,12 @@ class PlaylistHead extends StatelessWidget {
             iconSize: 25.0,
           ),
           IconButton(
+            icon: Container(
+                height: 20,
+                width: 23,
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: primaryColor),
+                child: const Icon(Icons.more_horiz, color: backgroundColor)),
             onPressed: () {},
-            icon: const Icon(Icons.more_horiz),
-            iconSize: 25.0,
           ),
         ],
       ),

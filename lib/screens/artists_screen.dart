@@ -521,7 +521,8 @@ class _ArtistSongsViewState extends State<ArtistSongsView> {
                 ),
                 trailing: IconButton(
                   icon: Container(
-                      height: 23,
+                      height: 20,
+                      width: 23,
                       decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: primaryColor),
                       child: const Icon(Icons.more_horiz, color: backgroundColor)),
                   onPressed: () {},
