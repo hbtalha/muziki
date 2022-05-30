@@ -1,3 +1,4 @@
+import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:muziki/models/artist.dart';
@@ -55,6 +56,22 @@ class _ArtistsScreenState extends State<ArtistsScreen> {
     super.initState();
     pages.add(FirstView(callback: goToAlbum, offset: offset));
     pages.add(widget);
+    BackButtonInterceptor.add(handleBackButton);
+  }
+
+  @override
+  void dispose() {
+    BackButtonInterceptor.remove(handleBackButton);
+    super.dispose();
+  }
+
+  bool handleBackButton(bool stopDefaultButtonEvent, RouteInfo info) {
+    if (_index == 1) {
+      setState(() {
+        _index = 0;
+      });
+    }
+    return true;
   }
 
   @override
@@ -62,25 +79,15 @@ class _ArtistsScreenState extends State<ArtistsScreen> {
     pages[0] = FirstView(callback: goToAlbum, offset: offset);
 
     return SafeArea(
-      child: WillPopScope(
-        onWillPop: () async {
-          if (_index == 1) {
-            setState(() {
-              _index = 0;
-            });
+      child: GestureDetector(
+        onHorizontalDragEnd: (dragEndDetails) {
+          if (dragEndDetails.primaryVelocity != null && dragEndDetails.primaryVelocity! < 0) {
+            widget.swipe(direction: SwipeDirection.right);
+          } else if (dragEndDetails.primaryVelocity != null && dragEndDetails.primaryVelocity! > 0) {
+            widget.swipe(direction: SwipeDirection.left);
           }
-          return false;
         },
-        child: GestureDetector(
-          onHorizontalDragEnd: (dragEndDetails) {
-            if (dragEndDetails.primaryVelocity != null && dragEndDetails.primaryVelocity! < 0) {
-              widget.swipe(direction: SwipeDirection.right);
-            } else if (dragEndDetails.primaryVelocity != null && dragEndDetails.primaryVelocity! > 0) {
-              widget.swipe(direction: SwipeDirection.left);
-            }
-          },
-          child: pages[_index],
-        ),
+        child: pages[_index],
       ),
     );
   }
@@ -114,124 +121,117 @@ class _FirstViewState extends State<FirstView> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-          print('show me something');
-         
-          return false;
-        },
-      child: Scaffold(
-        appBar: AppBar(
-          toolbarHeight: 130,
-          backgroundColor: backgroundColor,
-          centerTitle: false,
-          title: Column(
-            children: [
-              Row(
-                children: [
-                  circularTextButton(
-                    text: Text(
-                      "Artists",
+    return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: 130,
+        backgroundColor: backgroundColor,
+        centerTitle: false,
+        title: Column(
+          children: [
+            Row(
+              children: [
+                circularTextButton(
+                  text: Text(
+                    "Artists",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: _page == Page.artists ? blueColor : secondaryColor,
+                    ),
+                  ),
+                  onPressed: () => setPage(Page.artists),
+                  borderColor: _page == Page.artists ? blueColor : Colors.white70,
+                ),
+                const SizedBox(width: 5),
+                circularTextButton(
+                  text: Text("Album-Artists",
                       style: TextStyle(
                         fontSize: 18,
-                        color: _page == Page.artists ? blueColor : secondaryColor,
-                      ),
-                    ),
-                    onPressed: () => setPage(Page.artists),
-                    borderColor: _page == Page.artists ? blueColor : Colors.white70,
-                  ),
-                  const SizedBox(width: 5),
-                  circularTextButton(
-                    text: Text("Album-Artists",
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: _page == Page.albumArtists ? blueColor : secondaryColor,
-                        )),
-                    onPressed: () => setPage(Page.albumArtists),
-                    borderColor: _page == Page.albumArtists ? blueColor : Colors.white70,
-                  ),
-                  const SizedBox(width: 5),
-                  circularTextButton(
-                    text: Text("Genre",
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: _page == Page.genre ? blueColor : secondaryColor,
-                        )),
-                    onPressed: () => setPage(Page.genre),
-                    borderColor: _page == Page.genre ? blueColor : Colors.white70,
-                  ),
-                  const SizedBox(width: 5),
-                ],
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Expanded(
-                    child: InkWell(
-                      onTap: () {},
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 10, bottom: 10),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          children: const [
-                            Icon(Icons.search),
-                            Text(
-                              '  Search an album...',
-                              style: TextStyle(fontSize: 18),
-                            ),
-                          ],
-                        ),
+                        color: _page == Page.albumArtists ? blueColor : secondaryColor,
+                      )),
+                  onPressed: () => setPage(Page.albumArtists),
+                  borderColor: _page == Page.albumArtists ? blueColor : Colors.white70,
+                ),
+                const SizedBox(width: 5),
+                circularTextButton(
+                  text: Text("Genre",
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: _page == Page.genre ? blueColor : secondaryColor,
+                      )),
+                  onPressed: () => setPage(Page.genre),
+                  borderColor: _page == Page.genre ? blueColor : Colors.white70,
+                ),
+                const SizedBox(width: 5),
+              ],
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(
+                  child: InkWell(
+                    onTap: () {},
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 10, bottom: 10),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        children: const [
+                          Icon(Icons.search),
+                          Text(
+                            '  Search an album...',
+                            style: TextStyle(fontSize: 18),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.sort),
-                    iconSize: 25.0,
-                  ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.settings),
-                    iconSize: 25.0,
-                  ),
-                ],
-              ),
-              const Divider(),
-            ],
-          ),
+                ),
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.sort),
+                  iconSize: 25.0,
+                ),
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.settings),
+                  iconSize: 25.0,
+                ),
+              ],
+            ),
+            const Divider(),
+          ],
         ),
-        body: StreamBuilder<List<Artist>>(
-          stream: audioPlayer.artistsStream,
-          builder: (context, snapshot) {
-            List<Artist> artists = audioPlayer.artists;
-            var data = snapshot.data;
-            if (data != null) {
-              artists = data;
-            }
-            return ListView.builder(
-                controller: scrollController,
-                itemCount: artists.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return ListTile(
-                    onTap: () => widget.callback(artists[index], scrollController.offset),
-                    visualDensity: const VisualDensity(vertical: -3),
-                    dense: true,
-                    title: Text(artists[index].name,
-                        style: const TextStyle(
-                          color: primaryColor,
-                          fontSize: 14,
-                        )),
-                    subtitle: Text(
-                      '${artists[index].songs.length} songs',
+      ),
+      body: StreamBuilder<List<Artist>>(
+        stream: audioPlayer.artistsStream,
+        builder: (context, snapshot) {
+          List<Artist> artists = audioPlayer.artists;
+          var data = snapshot.data;
+          if (data != null) {
+            artists = data;
+          }
+          return ListView.builder(
+              controller: scrollController,
+              itemCount: artists.length,
+              itemBuilder: (BuildContext context, int index) {
+                return ListTile(
+                  onTap: () => widget.callback(artists[index], scrollController.offset),
+                  visualDensity: const VisualDensity(vertical: -3),
+                  dense: true,
+                  title: Text(artists[index].name,
                       style: const TextStyle(
-                        color: secondaryColor,
-                        fontSize: 12,
-                      ),
+                        color: primaryColor,
+                        fontSize: 14,
+                      )),
+                  subtitle: Text(
+                    '${artists[index].songs.length} songs',
+                    style: const TextStyle(
+                      color: secondaryColor,
+                      fontSize: 12,
                     ),
-                  );
-                });
-          },
-        ),
+                  ),
+                );
+              });
+        },
       ),
     );
   }

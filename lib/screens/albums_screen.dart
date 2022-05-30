@@ -1,3 +1,4 @@
+import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:muziki/models/album.dart';
@@ -52,31 +53,37 @@ class _AlbumsScreenState extends State<AlbumsScreen> {
     super.initState();
     pages.add(allAlbumsView(callback: goToAlbum, player: audioPlayer, offset: offset));
     pages.add(widget);
+    BackButtonInterceptor.add(handleBackButton);
+  }
+
+  @override
+  void dispose() {
+    BackButtonInterceptor.remove(handleBackButton);
+    super.dispose();
+  }
+
+  bool handleBackButton(bool stopDefaultButtonEvent, RouteInfo info) {
+    if (_index == 1) {
+      setState(() {
+        _index = 0;
+      });
+    }
+    return true;
   }
 
   @override
   Widget build(BuildContext context) {
     pages[0] = allAlbumsView(callback: goToAlbum, player: audioPlayer, offset: offset);
 
-    return WillPopScope(
-      onWillPop: () async {
-        if (_index == 1) {
-          setState(() {
-            _index = 0;
-          });
+    return GestureDetector(
+      onHorizontalDragEnd: (dragEndDetails) {
+        if (dragEndDetails.primaryVelocity != null && dragEndDetails.primaryVelocity! < 0) {
+          widget.swipe(direction: SwipeDirection.right);
+        } else if (dragEndDetails.primaryVelocity != null && dragEndDetails.primaryVelocity! > 0) {
+          widget.swipe(direction: SwipeDirection.left);
         }
-        return false;
       },
-      child: GestureDetector(
-        onHorizontalDragEnd: (dragEndDetails) {
-          if (dragEndDetails.primaryVelocity != null && dragEndDetails.primaryVelocity! < 0) {
-            widget.swipe(direction: SwipeDirection.right);
-          } else if (dragEndDetails.primaryVelocity != null && dragEndDetails.primaryVelocity! > 0) {
-            widget.swipe(direction: SwipeDirection.left);
-          }
-        },
-        child: pages[_index],
-      ),
+      child: pages[_index],
     );
   }
 }
@@ -121,7 +128,6 @@ Widget allAlbumsView({required AudioPlayerHandler player, required Function(Albu
                 mainAxisExtent: 175,
               ),
               itemBuilder: (context, index) {
-                                
                 return Card(
                   clipBehavior: Clip.antiAlias,
                   color: Colors.grey[900],
