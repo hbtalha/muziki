@@ -498,67 +498,13 @@ class _ArtistSongsViewState extends State<ArtistSongsView> {
               ),
             ];
           },
-          body: ListView.builder(
-            itemExtent: 50.0,
-            itemCount: songs.length,
-            itemBuilder: (context, index) {
-              const double albumArtSize = 35;
-              return ListTile(
-                onTap: () {
-                  widget.playSong(index, songs);
-                },
-                horizontalTitleGap: 4,
-                leading: Image(
-                  height: albumArtSize,
-                  width: albumArtSize,
-                  image: MemoryImage(songs[index].albumArt!),
-                  errorBuilder: (_, __, ___) {
-                    return Image.asset(
-                      'assets/cover.jpg',
-                      fit: BoxFit.cover,
-                    );
-                  },
-                ),
-                trailing: IconButton(
-                  icon: Container(
-                      height: 20,
-                      width: 23,
-                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: primaryColor),
-                      child: const Icon(Icons.more_horiz, color: backgroundColor)),
-                  onPressed: () {},
-                ),
-                title: Padding(
-                  padding: const EdgeInsets.only(top: 18, bottom: 2),
-                  child: Text(songs[index].trackName ?? songs[index].filenameWOExt,
-                      style: const TextStyle(
-                        color: primaryColor,
-                        fontSize: 14,
-                      )),
-                ),
-                subtitle: Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: Row(
-                    children: [
-                      Text(
-                        (songs[index].albumArtistName!),
-                        style: const TextStyle(
-                          color: primaryColor,
-                          fontSize: 12,
-                        ),
-                      ),
-                      const Spacer(),
-                      Text(
-                        formattedDuration(Duration(milliseconds: audioPlayer.songs[widget.artist.songs[index]].trackDuration!)),
-                        style: const TextStyle(
-                          color: primaryColor,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
+          body: songsListView(
+            songsOnDisplay: songs,
+            allSongs: widget.artist.songs,
+            onTap: (index) {
+              widget.playSong(index, songs);
             },
+            audioPlayer: audioPlayer,
           ),
         ),
       ),
